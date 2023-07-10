@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, ScrollView, StyleSheet } from 'react-native';
+import {  View, ScrollView } from 'react-native';
 import { Text, Card, Button, Icon } from 'react-native-elements';
-import { Link } from '@react-navigation/native';
 import axios from 'axios';
-import { FlatList } from 'react-native';
 
 
-export default function Lista({ navigation }) {
+export default function Principal({route, navigation }) {
     const [data, setData] = useState([]);
+    const { token } = route.params;
 
     useEffect(() => {
         listarUsuarios();
     }, []);
 
     const listarUsuarios = async () => {
-        try {
-            const response = await axios.get('http://192.168.2.181:8080/tudoProjetos');
-            setData(response.data);
-            console.log(response.data);
-        } catch (error) {
-            console.log(error);
+        axios.get('http://192.168.2.181:8080/tudoProjetos', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        }).then(Response => {
+            setData(Response.data);
         }
-    };
+        ).catch(
+          Response => {
+            console.log(Response);
+          }
+           )
+      }
 
 
     return (
@@ -41,7 +43,9 @@ export default function Lista({ navigation }) {
                                     <Card.Title>{item.num_projeto}</Card.Title>
                                     {/* </Link>  */}
                                     <Card.Divider />
-
+                                    <Text style={{ marginBottom: 10,textAlign:'center', color:'dark', fontWeight: 'bold', fontStyle: 'italic'}} >
+                                    {item.projetista_responsavel}
+                                    </Text>
                                     <Card.Image
                                         style={{ padding: 0 ,height:50}}
                                         source={require('../../Image/othon.png')}
@@ -67,7 +71,8 @@ export default function Lista({ navigation }) {
                                                 navigation.navigate('Historico', {
                                                     num_projeto: item.num_projeto,
                                                     cliente: item.cliente,
-                                                    num_orcamento: item.num_orcamento
+                                                    num_orcamento: item.num_orcamento,
+                                                    token:token
                                                 });
 
                                             }}

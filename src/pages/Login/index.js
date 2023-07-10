@@ -1,172 +1,44 @@
 import axios from "axios";
 import React, { useState } from 'react';
 import { View, Text, Button, TextInput, Image, StyleSheet, TouchableOpacity } from 'react-native';
+
 export default function Login({ navigation }) {
   const [usuario, setUsuario] = React.useState('');
   const [senha, setSenha] = React.useState('')
   const [data, setData] = React.useState('');
   const [pegarVersao, setPegarVersao] = React.useState('')
-  function validaSenha(senha) {
-    const regexLetras = /[a-zA-Z]/;
-    const regexEspecial = /[^a-zA-Z0-9]/;
-    const regexNumeros = /[0-9]/;
 
-    if (senha.length < 8) {
-      alert("A senha deve ter pelo menos 8 caracteres.");
-      return false;
+  const test = (a) => {
+
+    axios.get('http://192.168.2.181:8080/tudoProjetos', {
+      headers: { 'Authorization': `Bearer ${a}` },
+    }).then(Response => {
+      navigation.navigate('Principal', {
+        token: a,
+
+    });
     }
-    if (!regexLetras.test(senha)) {
-      alert("A senha deve conter pelo menos um letra.");
-      return false;
-    }
+    ).catch(
+      Response => {
+        alert("gay")
 
-    if (!regexEspecial.test(senha)) {
-      alert("A senha deve conter pelo menos um caracter especial.");
-      return false;
-    }
-
-    if (!regexNumeros.test(senha)) {
-      alert("A senha deve conter pelo menos um número.");
-      return false;
-    }
-    return true;
-  }
-
-  function Entrar() {
-    if (data.id) {
-      altomatico();
-      altomaticoData();
-      navigation.navigate('Principal');
-    }
-    altomatico();
-  }
-  function Entrars() {
-    if (data.id) {
-      altomatico();
-      altomaticoData();
-      Conferencia();
-    }
-    altomatico();
-  }
-  function Cadastro() {
-    if (usuario == 'administrador' && senha == 'admin') {
-      navigation.navigate('Cadastro');
-    } else {
-      alert("e necessario fornecer o usuario e a senha do administrador!")
-    }
-  }
-  const datas = async()=>{
-    await axios.get("http://192.168.2.181:4444/tudoo").then(certo => {
-    })
-  }
-  function Conferencia() {
-      navigation.navigate('MercadoriasNovas');
-
-  }
-  const altomatico = async () => {
-    await axios.put("http://187.72.17.137:4444/validarCadastro/" + 5 + "/" + data.id).then(certo => {
-
-    }).catch(error => {
-      alert(error)
-    })
-  }
-  const altomaticoData = async () => {
-    await axios.put("http://187.72.17.137:4444/validarData/" + '2023-06-23 13:56:26' + "/" + data.id).then(certo => {
-
-    }).catch(error => {
-      alert(error)
-    })
-  }
-  const versao = async cod => {
-    await axios
-      .get(`http://187.72.17.137:4444/versaoget/${data.vesao}`)
-      .then(Responses => {
-        const respostas = Responses.data
-        if (data.id) {
-          if (respostas == "" || data.vesao == "0") {
-            Entrar();
-          } else {
-            versa()
-            alert("Este App Esta Desatualizado.Tente Novamente ou Atualize Para a Versão " + pegarVersao)
-
-          }
-        }else{
-          versao()
-        }
-      }).catch(
+      }
     )
   }
-  const versaos = async cod => {
-    await axios
-      .get(`http://187.72.17.137:4444/versaoget/${data.vesao}`)
-      .then(Responses => {
-        const respostas = Responses.data
-        if (data.id) {
-          if (respostas == "" || data.vesao == "0") {
-            Entrars();
-          } else {
-            versa()
-            alert("Este App Esta Desatualizado.Tente Novamente ou Atualize Para a Versão " + pegarVersao)
+  const login = () => {
+    axios.post('http://192.168.2.181:8080/auth/login', {
 
-          }
-        }else{
-          versao()
-        }
-      }).catch(
-    )
+      login: usuario.toUpperCase(),
+      password: senha.toUpperCase()
+    }).then(Response => {
+     const a = Response.data.token;
+     test(a);
+    }
+    ).catch(Response => {
+      alert('Usuario e/ou a senha estão incorretas')
+    })
   }
 
-  const versa = async cod => {
-    await axios
-      .get(`http://187.72.17.137:4444/numeroVersao/${data.vesao}`)
-      .then(Responses => {
-        if (Responses == 1) {
-          setPegarVersao("0")
-        } else { setPegarVersao(Responses.data.vesao) }
-
-      }).catch(error => {
-        alert(error)
-      })
-  }
-
-  const ValidarLogin = async cod => {
-    await axios
-      .get(`http://187.72.17.137:4444/login/${usuario}/${senha}`)
-      .then(Response => {
-        const resposta = Response.data
-        setData(resposta);
-        if (resposta != "Usuario não encontrado.") {
-          altomatico();
-          altomaticoData();
-          versao();
-        } else {
-          alert("Usuario Ou Senha Incorreta")
-
-        }
-
-      }).catch(erro => {
-        alert("Ops Ocorreu um erro")
-      });
-  };
-  const ValidarCadastro = async cod => {
-    await axios
-      .get(`http://187.72.17.137:4444/login/${usuario}/${senha}`)
-      .then(Response => {
-        const resposta = Response.data
-        setData(resposta);
-        if (resposta != "Usuario não encontrado.") {
-          altomatico();
-          altomaticoData();
-          versaos();
-        } else {
-          alert("Usuario Ou Senha Incorreta")
-
-        }
-
-      }).catch(erro => {
-        alert("Ops Ocorreu um erro")
-      });
-  };
   return (
     <View style={styles.centered}>
 
@@ -207,15 +79,12 @@ export default function Login({ navigation }) {
           borderWidth: 2,
         }}
       />
-      {/* <Button
-        title="Entrar"
-        // onPress={() => navigation.navigate('Principal')}
-      /> */}
+
       <View style={{
         display: "flex", flexDirection: "row", alignItems: 'center',
         justifyContent: 'center',
       }}>
-        <TouchableOpacity onPress={() => ValidarLogin()}>
+        <TouchableOpacity onPress={() => login()}>
           <View style={{
             backgroundColor: '#1a9ce8',
             alignItems: 'center',
@@ -230,41 +99,6 @@ export default function Login({ navigation }) {
             <Text style={{ color: 'white' }}>Entrar</Text>
           </View>
         </TouchableOpacity>
-        {
-          usuario == 'administrador' && senha == 'admin' ?
-            <TouchableOpacity onPress={() => Cadastro()}>
-              <View style={{
-                backgroundColor: '#1a9ce8',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 15,
-                padding: 20,
-                margin: 10,
-                paddingLeft: 30,
-                paddingRight: 30
-              }}
-              >
-                <Text style={{ color: 'white' }}>Cadastro</Text>
-              </View>
-            </TouchableOpacity> :
-            print("não e administrador")
-        }
-
-            <TouchableOpacity onPress={() => ValidarCadastro()}>
-              <View style={{
-                backgroundColor: '#1a9ce8',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 15,
-                padding: 20,
-                margin: 10,
-                paddingLeft: 30,
-                paddingRight: 30
-              }}
-              >
-                <Text style={{ color: 'white' }}>Conferencia</Text>
-              </View>
-            </TouchableOpacity> 
 
       </View>
       <View style={{ justifyContent: 'center', alignItems: 'center' }}>

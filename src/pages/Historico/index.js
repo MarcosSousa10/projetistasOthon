@@ -6,7 +6,7 @@ import { Text } from "react-native-elements";
 export default function Historico({ route, navigation }) {
     const [data, setData] = useState([]);
 
-    const { num_projeto, cliente, num_orcamento } = route.params;
+    const { num_projeto, cliente, num_orcamento,token } = route.params;
 
 
     useEffect(() => {
@@ -15,7 +15,9 @@ export default function Historico({ route, navigation }) {
 
     const listarUsuarios = async () => {
         try {
-            await axios.get(`http://192.168.2.181:8080/Historico/${num_projeto}`).then(Response => {
+            await axios.get(`http://192.168.2.181:8080/Historico/${num_projeto}`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+              }).then(Response => {
                 setData(Response.data);
             }).catch(error => {
                 alert("Erro ao carregar histórico");
@@ -51,14 +53,14 @@ export default function Historico({ route, navigation }) {
                                     Data: {item.data_acao}
                                 </Text>
                                 <Text style={{
-                                    marginBottom: 8, color: 'purple', fontSize: 20
+                                    color: 'purple', fontSize: 20
                                 }} >
                                     Descrição:
                                     <Text>
                                         {item.descricao}
                                     </Text>
                                 </Text>
-                                <Text style={{ color: 'purple', fontSize: 20 }}>
+                                <Text style={{ marginBottom: 8, color: 'purple', fontSize: 20 }}>
                                     Responsavel: <Text>{item.responsavel}</Text> 
                                 </Text>
                             </View>
