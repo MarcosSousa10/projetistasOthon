@@ -13,7 +13,7 @@ export default function Principal({route, navigation }) {
     }, []);
 
     const listarUsuarios = async () => {
-        axios.get('http://192.168.2.181:8080/tudoProjetos', {
+        axios.get('http://192.168.2.181:5555/tudoProjetos', {
           headers: { 'Authorization': `Bearer ${token}` },
         }).then(Response => {
             setData(Response.data);

@@ -12,7 +12,6 @@ export default function App() {
       <Stack.Screen name="Principal" component={Principal} />
       <Stack.Screen name="Historico" component={Historico} />
       <Stack.Screen name="Login" component={Login} />
-
       </Stack.Navigator>
   </NavigationContainer>
   );

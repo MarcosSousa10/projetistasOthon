@@ -1,23 +1,55 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
+import {Button, Icon } from 'react-native-elements';
 import { Text } from "react-native-elements";
-
+import RNFetchBlob from 'rn-fetch-blob';
 export default function Historico({ route, navigation }) {
     const [data, setData] = useState([]);
 
-    const { num_projeto, cliente, num_orcamento,token } = route.params;
+    const { num_projeto, cliente, num_orcamento, token } = route.params;
 
 
+ const openPageInChrome = async () => {
+   const fileUrl = `http://192.168.2.181:5555/relatorio?NumOrcamento=${num_orcamento}`;
+   const fileExt = '.pdf'; // Extensão do arquivo PDF
+   const filePath = `${RNFetchBlob.fs.dirs.DownloadDir}/relatorio${fileExt}`; // Caminho e nome do arquivo PDF a ser salvo
+ 
+   const headers = {
+     Authorization: `Bearer ${token}`,
+   };
+ 
+   try {
+     const response = await RNFetchBlob.config({
+       fileCache: true,
+       addAndroidDownloads: {
+         useDownloadManager: true,
+         notification: true,
+         mime: 'application/pdf',
+         path: filePath,
+         description: 'Baixando relatório de vendas',
+       },
+     }).fetch('GET', fileUrl, headers);
+ 
+     console.log('Download do PDF concluído: ', response.path());
+ 
+     // Aqui você pode fazer algo com o arquivo PDF, como abrir em um visualizador ou compartilhar
+   } catch (error) {
+     console.error('Erro ao baixar o PDF: ', error);
+   }
+ };
+ 
+
+    
     useEffect(() => {
         listarUsuarios();
     }, []);
 
     const listarUsuarios = async () => {
         try {
-            await axios.get(`http://192.168.2.181:8080/Historico/${num_projeto}`, {
+            await axios.get(`http://192.168.2.181:5555/Historico/${num_projeto}`, {
                 headers: { 'Authorization': `Bearer ${token}` },
-              }).then(Response => {
+            }).then(Response => {
                 setData(Response.data);
             }).catch(error => {
                 alert("Erro ao carregar histórico");
@@ -32,11 +64,13 @@ export default function Historico({ route, navigation }) {
         <View style={{
             flexDirection: "column"
         }}>
-            <View style={{flexDirection: 'column',
-                        justifyContent: "center",
-                        alignItems: "center"}}>
-                <Text style={{fontSize:30, color:'red'}}>{cliente}</Text>
-                <Text style={{fontSize:20}}>Numero do Projeto: {num_projeto}</Text>
+            <View style={{
+                flexDirection: 'column',
+                justifyContent: "center",
+                alignItems: "center"
+            }}>
+                <Text style={{ fontSize: 30, color: 'red' }}>{cliente}</Text>
+                <Text style={{ fontSize: 20 }}>Numero do Projeto: {num_projeto}</Text>
             </View>
 
             {data.map((item, index) => (
@@ -61,7 +95,7 @@ export default function Historico({ route, navigation }) {
                                     </Text>
                                 </Text>
                                 <Text style={{ marginBottom: 8, color: 'purple', fontSize: 20 }}>
-                                    Responsavel: <Text>{item.responsavel}</Text> 
+                                    Responsavel: <Text>{item.responsavel}</Text>
                                 </Text>
                             </View>
                             :
@@ -71,7 +105,18 @@ export default function Historico({ route, navigation }) {
                 </View>
 
             ))}
-
+            <Button
+                icon={
+                    <Icon
+                        name="clipboard-outline"
+                        type="ionicon"
+                        color="#ffffff"
+                        iconStyle={{ marginRight: 1 }}
+                    />
+                }
+                title="GerarRelatorio"
+                onPress={openPageInChrome}
+            />
         </View>
     )
 } const styles = StyleSheet.create({

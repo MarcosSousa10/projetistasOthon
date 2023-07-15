@@ -10,13 +10,14 @@ export default function Login({ navigation }) {
 
   const test = (a) => {
 
-    axios.get('http://192.168.2.181:8080/tudoProjetos', {
+    axios.get('http://192.168.2.181:5555/tudoProjetos', {
       headers: { 'Authorization': `Bearer ${a}` },
     }).then(Response => {
       navigation.navigate('Principal', {
         token: a,
-
     });
+    setUsuario("");
+        setSenha("");
     }
     ).catch(
       Response => {
@@ -26,7 +27,7 @@ export default function Login({ navigation }) {
     )
   }
   const login = () => {
-    axios.post('http://192.168.2.181:8080/auth/login', {
+    axios.post('http://192.168.2.181:5555/auth/login', {
 
       login: usuario.toUpperCase(),
       password: senha.toUpperCase()
